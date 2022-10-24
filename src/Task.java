@@ -1,5 +1,3 @@
-import java.util.Objects;
-
 public class Task {
     private String name; //Название, кратко описывающее суть задачи (например, «Переезд»).
     private String description; //Описание, в котором раскрываются детали.
@@ -48,17 +46,5 @@ public class Task {
         this.uin = uin;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Task task = (Task) o;
-        return uin == task.uin
-                && name.equals(task.name);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, uin);
-    }
 }
