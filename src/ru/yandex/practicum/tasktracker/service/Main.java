@@ -1,7 +1,13 @@
+package ru.yandex.practicum.tasktracker.service;
+
+import ru.yandex.practicum.tasktracker.model.Epic;
+import ru.yandex.practicum.tasktracker.model.Subtask;
+import ru.yandex.practicum.tasktracker.model.Task;
+import ru.yandex.practicum.tasktracker.model.TaskStatus;
+
 public class Main {
 
     public static void main(String[] args) {
-
         System.out.println("Поехали!");
 
         TaskManager manager = new TaskManager();
@@ -74,6 +80,7 @@ public class Main {
         newSubtask.setStatus(TaskStatus.IN_PROGRESS);
         manager.updateSubtask(newSubtask);
 
+        System.out.println("После обновления статусов:");
         System.out.println(manager.getListedOfAllEpics());
         System.out.println(manager.getListedOfAllTasks());
         System.out.println(manager.getListedOfAllSubtasks());
@@ -82,9 +89,9 @@ public class Main {
         manager.deletEpicByID(2);
         manager.deletTaskByID(1);
 
+        System.out.println("После удаления эпика и задачи:");
         System.out.println(manager.getListedOfAllEpics());
         System.out.println(manager.getListedOfAllTasks());
         System.out.println(manager.getListedOfAllSubtasks());
-
     }
 }
