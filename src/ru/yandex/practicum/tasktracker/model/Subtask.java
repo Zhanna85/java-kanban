@@ -13,7 +13,7 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "ru.yandex.practicum.tasktracker.model.Subtask{" +
+        return "Subtask{" +
                 "nameSubtask='" + super.getName() + '\'' +
                 ", SubtaskDescription='" + super.getDescription() + '\'' +
                 ", uinSubtask=" + super.getUin() +

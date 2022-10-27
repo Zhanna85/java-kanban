@@ -103,38 +103,41 @@ public class TaskManager {
     }
 
     public Task getByIDTask(int id) { // Получение по идентификатору.
-        if (!tasks.containsKey(id)) {
-            System.out.println("Идентификатор задачи указан не верно!");
-        }
         return tasks.get(id);
     }
 
     public Epic getByIDEpic(int id) { // Получение по идентификатору.
-        if (!epics.containsKey(id)) {
-            System.out.println("Идентификатор эпика указан не верно!");
-        }
         return epics.get(id);
     }
 
     public Subtask getByIDSubtask(int id) { // Получение по идентификатору.
-        if (!subtasks.containsKey(id)) {
-            System.out.println("Идентификатор подзадачи указан не верно!");
-        }
         return subtasks.get(id);
     }
 
     public void updateTask(Task task) { // Обновление. Новая версия объекта с верным id передаётся в виде параметра.
-        tasks.put(task.getUin(), task);
+        if (tasks.containsKey(task.getUin())) {
+            tasks.put(task.getUin(), task);
+        } else {
+            System.out.println("Задача не найдена!");
+        }
     }
 
     public void updateEpic(Epic epic) { // Обновление. Новая версия объекта с верным id передаётся в виде параметра.
-        epics.put(epic.getUin(), epic);
+        if (epics.containsKey(epic.getUin())) {
+            epics.put(epic.getUin(), epic);
+        } else {
+            System.out.println("Эпик не найден!");
+        }
     }
 
     public void updateSubtask(Subtask subtask) { // Обновление.
-        subtasks.put(subtask.getUin(), subtask);
-        Epic epic = epics.get(subtask.getEpicId());
-        updateStatusEpic(epic);
+        if (subtasks.containsKey(subtask.getUin())) {
+            subtasks.put(subtask.getUin(), subtask);
+            Epic epic = epics.get(subtask.getEpicId());
+            updateStatusEpic(epic);
+        } else {
+            System.out.println("Подзадача не найдена!");
+        }
     }
 
     public void deletTaskByID(int id) { // Удаление по идентификатору задачи.
@@ -160,7 +163,7 @@ public class TaskManager {
     public void deletSubtaskByID(Integer id) { // Удаление по идентификатору подзадачи.
         if (subtasks.containsKey(id)) {
             Epic epic = epics.get(subtasks.get(id).getEpicId());
-            epic.removeListIdSubtasks(id); // Удаляем подзадачу из списка в Эпике
+            epic.removeListIdSubtask(id); // Удаляем подзадачу из списка в Эпике
             subtasks.remove(id); // Удаляем подзадачу
             updateStatusEpic(epic); // Обновляем статус Эпика
         }

@@ -4,27 +4,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Epic extends Task {
-    private ArrayList<Integer> listIdSubtasks = new ArrayList<>(); // Список уин подзадач
+    private final ArrayList<Integer> listIdSubtasks = new ArrayList<>(); // Список уин подзадач
 
     public ArrayList<Integer> getListIdSubtasks() {
         return listIdSubtasks;
     }
 
-    public void removeListIdSubtasks(Integer index) {
-        this.listIdSubtasks.remove(index);
+    public void removeListIdSubtask(Integer index) {
+        listIdSubtasks.remove(index);
     }
 
     public void addListIdSubtasks(int idSubtask) {
-        this.listIdSubtasks.add(idSubtask);
+        listIdSubtasks.add(idSubtask);
     }
 
     public void clearListIdSubtasks() {
-        this.listIdSubtasks.clear();
+        listIdSubtasks.clear();
     }
 
     @Override
     public String toString() { // нужен для информативного результата
-        return "ru.yandex.practicum.tasktracker.model.Epic{" +
+        return "Epic{" +
                 "nameEpic='" + super.getName() + '\'' +
                 ", EpicDescription='" + super.getDescription() + '\'' +
                 ", uinEpic=" + super.getUin() +

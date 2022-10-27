@@ -40,7 +40,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "ru.yandex.practicum.tasktracker.model.Task{" +
+        return "Task{" +
                 "nameTask='" + name + '\'' +
                 ", taskDescription='" + description + '\'' +
                 ", uinTask=" + uin +
