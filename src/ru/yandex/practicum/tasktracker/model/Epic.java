@@ -10,7 +10,7 @@ public class Epic extends Task {
         return listIdSubtasks;
     }
 
-    public void removeListIdSubtasks(int index) {
+    public void removeListIdSubtasks(Integer index) {
         this.listIdSubtasks.remove(index);
     }
 

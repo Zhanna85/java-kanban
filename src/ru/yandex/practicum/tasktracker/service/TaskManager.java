@@ -157,14 +157,10 @@ public class TaskManager {
         }
     }
 
-    public void deletSubtaskByID(int id) { // Удаление по идентификатору подзадачи.
+    public void deletSubtaskByID(Integer id) { // Удаление по идентификатору подзадачи.
         if (subtasks.containsKey(id)) {
             Epic epic = epics.get(subtasks.get(id).getEpicId());
-            for (int i = 0; i < epic.getListIdSubtasks().size(); i++) { // Удалаем id подзадачи из списка эпика
-                if (epic.getListIdSubtasks().get(i) == id) { //удалем через цикл, т.к. значение в списке типа int
-                    epic.removeListIdSubtasks(i);
-                }
-            }
+            epic.removeListIdSubtasks(id); // Удаляем подзадачу из списка в Эпике
             subtasks.remove(id); // Удаляем подзадачу
             updateStatusEpic(epic); // Обновляем статус Эпика
         }
