@@ -11,18 +11,45 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager{
-    private Map<Integer, Subtask> subtasks = new HashMap<>(); // Tаблица подзадач
-    private Map<Integer, Task> tasks = new HashMap<>(); // Таблица задач
-    private Map<Integer, Epic> epics = new HashMap<>(); // Таблица эпиков
+    private final Map<Integer, Subtask> subtasks = new HashMap<>(); // Tаблица подзадач
+    private final Map<Integer, Task> tasks = new HashMap<>(); // Таблица задач
+    private final Map<Integer, Epic> epics = new HashMap<>(); // Таблица эпиков
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     private int idTask = 0; // УИН задач
     private int idEpic = 0; // УИН эпиков
     private int idSubtask = 0; // УИН подзадач
 
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
+    private void updateStatusEpic(Epic epic) {
+        int newStatus = 0;
+        int doneStatus = 0;
+
+        if (epic.getListIdSubtasks().isEmpty()) {
+            epic.setStatus(TaskStatus.NEW);
+        } else {
+            for (int idSubtask : epic.getListIdSubtasks()) { // Проверяем статусы задач
+                TaskStatus statusSubtask = subtasks.get(idSubtask).getStatus();
+                switch (statusSubtask) {
+                    case NEW:
+                        newStatus++;
+                        break;
+                    case DONE:
+                        doneStatus++;
+                        break;
+                }
+            }
+            if (newStatus == epic.getListIdSubtasks().size()) {
+                epic.setStatus(TaskStatus.NEW);
+            } else if (doneStatus == epic.getListIdSubtasks().size()) {
+                epic.setStatus(TaskStatus.DONE);
+            } else {
+                epic.setStatus(TaskStatus.IN_PROGRESS);
+            }
+        }
+    }
 
     @Override
-    public List<Task> getHistoryManager() {
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 
@@ -196,34 +223,6 @@ public class InMemoryTaskManager implements TaskManager{
             epic.removeListIdSubtask(id); // Удаляем подзадачу из списка в Эпике
             subtasks.remove(id); // Удаляем подзадачу
             updateStatusEpic(epic); // Обновляем статус Эпика
-        }
-    }
-
-    public void updateStatusEpic(Epic epic) {
-        int newStatus = 0;
-        int doneStatus = 0;
-
-        if (epic.getListIdSubtasks().isEmpty()) {
-            epic.setStatus(TaskStatus.NEW);
-        } else {
-            for (int idSubtask : epic.getListIdSubtasks()) { // Проверяем статусы задач
-                TaskStatus statusSubtask = subtasks.get(idSubtask).getStatus();
-                switch (statusSubtask) {
-                    case NEW:
-                        newStatus++;
-                        break;
-                    case DONE:
-                        doneStatus++;
-                        break;
-                }
-            }
-            if (newStatus == epic.getListIdSubtasks().size()) {
-                epic.setStatus(TaskStatus.NEW);
-            } else if (doneStatus == epic.getListIdSubtasks().size()) {
-                epic.setStatus(TaskStatus.DONE);
-            } else {
-                epic.setStatus(TaskStatus.IN_PROGRESS);
-            }
         }
     }
 

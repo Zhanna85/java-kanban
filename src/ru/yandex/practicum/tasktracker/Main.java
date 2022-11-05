@@ -1,9 +1,11 @@
-package ru.yandex.practicum.tasktracker.service;
+package ru.yandex.practicum.tasktracker;
 
 import ru.yandex.practicum.tasktracker.model.Epic;
 import ru.yandex.practicum.tasktracker.model.Subtask;
 import ru.yandex.practicum.tasktracker.model.Task;
 import ru.yandex.practicum.tasktracker.model.TaskStatus;
+import ru.yandex.practicum.tasktracker.service.Managers;
+import ru.yandex.practicum.tasktracker.service.TaskManager;
 
 public class Main {
 
@@ -59,9 +61,9 @@ public class Main {
 
         System.out.println("История вызова задач:");
         System.out.println(taskManager.getByIDTask(1));
-        System.out.println("Список задач : " + taskManager.getHistoryManager());
+        System.out.println("Список задач : " + taskManager.getHistory());
         System.out.println(taskManager.getByIDEpic(1));
         System.out.println(taskManager.getByIDSubtask(2));
-        System.out.println("Список задач : " + taskManager.getHistoryManager());
+        System.out.println("Список задач : " + taskManager.getHistory());
     }
 }

@@ -6,14 +6,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager{
-    private final List<Task> historyTask = new LinkedList<>();
+    private static final int SIZE_LIST = 10; // Размер списка не должен превышать 10 элементов.
+
+    private final LinkedList<Task> historyTask = new LinkedList<>(); // Список для хранения просмотренных задач.
 
     @Override
     public void add(Task task) {
-        if (historyTask.size() > 10) {
-            historyTask.remove(0);
+        if (historyTask.size() == SIZE_LIST) {
+            historyTask.removeFirst();
         }
-        historyTask.add(task);
+        if (task != null) {
+            historyTask.addLast(task);
+        }
     }
 
     @Override

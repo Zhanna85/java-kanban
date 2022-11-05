@@ -1,7 +1,7 @@
 package ru.yandex.practicum.tasktracker.service;
 
 public class Managers {
-    static TaskManager getDefault() {
+    public static TaskManager getDefault() {
         return new InMemoryTaskManager();
     }
 
