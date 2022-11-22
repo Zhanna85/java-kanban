@@ -9,7 +9,7 @@ public class InMemoryHistoryManager implements HistoryManager{
     private Node<Task> head; // Указатель на первый элемент списка.
     private Node<Task> tail; // Указатель на последний элемент списка.
 
-    private Node<Task> linkLast(Task task) { // Создаем новый узел и добавляем задачу в tail.
+    private void linkLast(Task task) { // Создаем новый узел и добавляем задачу в tail.
         Node<Task> oldTail = tail;
         Node<Task> newNode = new Node<>(oldTail, task, null);
         tail = newNode;
@@ -19,8 +19,6 @@ public class InMemoryHistoryManager implements HistoryManager{
         } else {
             oldTail.next = newNode;
         }
-
-        return newNode;
     }
 
     private List<Task> getTasks() {
@@ -67,10 +65,11 @@ public class InMemoryHistoryManager implements HistoryManager{
     public void add(Task task) {
         if (task != null) {
             if (viewedTasks.containsKey(task.getUin())) {
-                remove(task.getUin());
+                Node<Task> node = viewedTasks.get(task.getUin()); // Находим узел по id Task.
+                removeNode(node); // Вырезаем узел из списка.
             }
-            Node<Task> newNode = linkLast(task);
-            viewedTasks.put(task.getUin(), newNode);
+            linkLast(task); // Создаем новый узел и добавляем задачу в tail
+            viewedTasks.put(task.getUin(), tail);
         }
     }
 
