@@ -34,7 +34,6 @@ public class InMemoryHistoryManager implements HistoryManager{
     }
 
     private void removeNode(Node<Task> node) {  // "Вырезаем" узел.
-        final Task task = node.data; // Данные внутри элемента.
         final Node<Task> nextNode = node.next; // Ссылка на следующий узел.
         final Node<Task> prevNode = node.prev; // Ссылка на предыдущий узел.
 
@@ -43,7 +42,7 @@ public class InMemoryHistoryManager implements HistoryManager{
          */
         if (prevNode == null) {
             head = nextNode; // присваиваем ссылку следующего элемента удаляемого узла head.
-        } else { // Если узел не первого элемента списка и имеет ссылки next и prev.
+        } else { // Если узел не первого элемента списка или имеет ссылки next и prev.
             prevNode.next = nextNode;
             node.prev = null; // Обнуляем ссылку у удаляемого узла.
         }
@@ -53,7 +52,7 @@ public class InMemoryHistoryManager implements HistoryManager{
         */
         if (nextNode == null) {
             tail = prevNode;
-        } else { // Если узел не первого элемента списка и имеет ссылки next и prev.
+        } else { // Если узел не последнего элемента в списке или имеет ссылки next и prev.
             nextNode.prev = prevNode;
             node.next = null;
         }
@@ -64,10 +63,7 @@ public class InMemoryHistoryManager implements HistoryManager{
     @Override
     public void add(Task task) {
         if (task != null) {
-            if (viewedTasks.containsKey(task.getUin())) {
-                Node<Task> node = viewedTasks.get(task.getUin()); // Находим узел по id Task.
-                removeNode(node); // Вырезаем узел из списка.
-            }
+            remove(task.getUin());
             linkLast(task); // Создаем новый узел и добавляем задачу в tail
             viewedTasks.put(task.getUin(), tail);
         }
@@ -85,5 +81,17 @@ public class InMemoryHistoryManager implements HistoryManager{
     @Override
     public List<Task> getHistory() { //надо изменить
         return getTasks();
+    }
+
+    static class Node<Task> {
+        public Task data; // Данные внутри элемента.
+        public Node<Task> next;
+        public Node<Task> prev; // Ссылка на предыдущий узел.
+
+        public Node(Node<Task> prev, Task data, Node<Task> next) {
+            this.data = data;
+            this.next = next;
+            this.prev = prev;
+        }
     }
 }

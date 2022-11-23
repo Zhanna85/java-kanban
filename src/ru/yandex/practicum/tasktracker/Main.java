@@ -80,7 +80,9 @@ public class Main {
 
         // Удаляем созданные задачи:
         taskManager.deleteEpicByID(3);
-        System.out.println("История просмотра после удаления Эпика ID3: " + taskManager.getHistory()); // Проверяем, что эпика и подзадач нет.
+
+        // Проверяем, что эпика и подзадач нет.
+        System.out.println("История просмотра после удаления Эпика ID3: " + taskManager.getHistory());
 
         // Удаляем задачу и проверяем, что его нет в истории.
         taskManager.deleteTaskByID(2);
