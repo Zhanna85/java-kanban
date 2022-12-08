@@ -6,6 +6,10 @@ import java.util.Arrays;
 public class Epic extends Task {
     private final ArrayList<Integer> listIdSubtasks = new ArrayList<>(); // Список уин подзадач
 
+    public Epic(int uin, TypesTasks type, String name, TaskStatus status, String description) {
+        super(uin, type, name, status, description);
+    }
+
     public ArrayList<Integer> getListIdSubtasks() {
         return listIdSubtasks;
     }
@@ -25,10 +29,11 @@ public class Epic extends Task {
     @Override
     public String toString() { // нужен для информативного результата
         return "Epic{" +
-                "nameEpic='" + super.getName() + '\'' +
-                ", EpicDescription='" + super.getDescription() + '\'' +
-                ", uinEpic=" + super.getUin() +
+                "uin=" + super.getUin() +
+                ", type=" + super.getType() +
+                ", name='" + super.getName() + '\'' +
                 ", status=" + super.getStatus() +
+                ", description='" + super.getDescription() + '\'' +
                 ", listIdSubtasks=" + Arrays.asList(listIdSubtasks) +
                 '}';
     }

@@ -1,10 +1,27 @@
 package ru.yandex.practicum.tasktracker.model;
 
 public class Task {
-    private String name; // Название, кратко описывающее суть задачи (например, «Переезд»).
-    private String description; // Описание, в котором раскрываются детали.
     private int uin; // Уникальный идентификационный номер задачи, по которому её можно будет найти.
+    private TypesTasks type; // Тип задачи.
+    private String name; // Название, кратко описывающее суть задачи (например, «Переезд»).
     private TaskStatus status; // Статус, отображающий её прогресс.
+    private String description; // Описание, в котором раскрываются детали.
+
+    public Task(int uin, TypesTasks type, String name, TaskStatus status, String description) {
+        this.uin = uin;
+        this.type = type;
+        this.name = name;
+        this.status = status;
+        this.description = description;
+    }
+
+    public TypesTasks getType() {
+        return type;
+    }
+
+    public void setType(TypesTasks type) {
+        this.type = type;
+    }
 
     public String getName() {
         return name;
@@ -38,13 +55,18 @@ public class Task {
         this.uin = uin;
     }
 
+    public Integer getEpicId() {
+        return null;
+    }
+
     @Override
     public String toString() {
         return "Task{" +
-                "nameTask='" + name + '\'' +
-                ", taskDescription='" + description + '\'' +
-                ", uinTask=" + uin +
+                "uin=" + uin +
+                ", type=" + type +
+                ", name='" + name + '\'' +
                 ", status=" + status +
+                ", description='" + description + '\'' +
                 '}';
     }
 }
