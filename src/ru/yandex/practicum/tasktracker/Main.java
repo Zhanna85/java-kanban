@@ -14,6 +14,14 @@ public class Main {
 
         TaskManager taskManager = Managers.getDefaultNewManager();
 
+        System.out.println("Список: " + taskManager.getListedOfAllEpics());
+        System.out.println();
+        System.out.println("Список: " + taskManager.getListedOfAllTasks());
+        System.out.println();
+        System.out.println("Список: " + taskManager.getListedOfAllSubtasks());
+        System.out.println();
+        System.out.println("История: " + taskManager.getHistory());
+
         Task newTask1 = new Task(1, TASK, "Задача №1", IN_PROGRESS, "Описание задачи №1");
         taskManager.createTask(newTask1);
 
@@ -26,7 +34,7 @@ public class Main {
         Subtask newSubtask1 = new Subtask(4, SUBTASK, "Подзадача №1 эпика №1", IN_PROGRESS,"Описание подзадачи №1 эпика №1", 3);
         taskManager.createSubtask(newSubtask1);
 
-        Subtask newSubtask2 = new Subtask(5, SUBTASK, "Подзадача №2 эпика №1", NEW, "Описание подзадачи №2 эпика №1", 3);
+        Subtask newSubtask2 = new Subtask(5, SUBTASK, "Подзадача №2 эпика №1", NEW, "Описание подзадачи №2 эпика №2", 3);
         taskManager.createSubtask(newSubtask2);
 
         Epic newEpic2 = new Epic(6, EPIC, "Эпик №2", NEW, "Описание эпика №2");
@@ -39,14 +47,11 @@ public class Main {
 
         // Запрашиваем созданные задачи несколько раз и проверяем историю на дубли и порядок.
         System.out.println("Запрашиваем созданные задачи (1):");
-        System.out.println(taskManager.getByIDTask(1));
-        System.out.println(taskManager.getByIDEpic(3));
+        System.out.println(taskManager.getByIDEpic(6));
+        System.out.println(taskManager.getByIDSubtask(4));
         System.out.println(taskManager.getByIDSubtask(5));
-        System.out.println("История просмотра: " + taskManager.getHistory());
-        System.out.println("Запрашиваем созданные задачи (2):");
-        System.out.println(taskManager.getByIDTask(2));
         System.out.println(taskManager.getByIDTask(1));
-        System.out.println(taskManager.getByIDSubtask(5));
+        System.out.println(taskManager.getByIDSubtask(4));
         System.out.println(taskManager.getByIDEpic(3));
         System.out.println("История просмотра: " + taskManager.getHistory());
     }
