@@ -31,7 +31,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 while (!(value = reader.readLine()).isBlank()) { // До пустой строки.
                     task = tasksManager.fromString(value);
                     tasksManager.addTasksToTheMap(task);
-                    tasksManager.prioritizedTasks.add(task);
+
+                    if (task.getType() != TypesTasks.EPIC) {
+                        tasksManager.prioritizedTasks.add(task);
+                    }
 
                     if (task.getUin() > maxId) {
                         maxId = task.getUin();
@@ -39,7 +42,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 }
 
                 String lineHistoryTask = reader.readLine();
-                if (!lineHistoryTask.isBlank()) {
+                if (lineHistoryTask != null) {
                     List<Integer> idHistoryTask = historyFromString(lineHistoryTask);
 
                     for (Integer id : idHistoryTask) {

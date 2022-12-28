@@ -182,8 +182,6 @@ public class InMemoryTaskManager implements TaskManager{
                 prioritizedTasks.remove(entry.getValue());
             }
             tasks.clear();
-        } else {
-            System.out.println("Список задач пуст!");
         }
     }
 
@@ -203,8 +201,6 @@ public class InMemoryTaskManager implements TaskManager{
                 }
                 subtasks.clear();
             }
-        } else {
-            System.out.println("Список эпиков пуст!");
         }
     }
 
