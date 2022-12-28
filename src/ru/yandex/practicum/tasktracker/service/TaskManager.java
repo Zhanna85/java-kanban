@@ -6,6 +6,7 @@ import ru.yandex.practicum.tasktracker.model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
     void createTask(Task task);
@@ -44,7 +45,9 @@ public interface TaskManager {
 
     void deleteSubtaskByID(Integer id);
 
-    ArrayList<Subtask> getListAllSubtasksOfEpic(int id);
+    List<Subtask> getListAllSubtasksOfEpic(int id);
 
     List<Task> getHistory();
+
+    Set<Task> getPrioritizedTasks();
 }

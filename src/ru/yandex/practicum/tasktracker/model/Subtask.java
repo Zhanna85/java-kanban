@@ -1,10 +1,12 @@
 package ru.yandex.practicum.tasktracker.model;
 
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
     private Integer epicId;
 
-    public Subtask(int uin, TypesTasks type, String name, TaskStatus status, String description, int epicId) {
-        super(uin, type, name, status, description);
+    public Subtask(int uin, TypesTasks type, String name, TaskStatus status, String description, int duration, LocalDateTime startTime, Integer epicId) {
+        super(uin, type, name, status, description, duration, startTime);
         this.epicId = epicId;
     }
 
@@ -19,12 +21,15 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "Subtask{" +
-                "uin=" + super.getUin() +
-                ", type=" + super.getType() +
-                ", name='" + super.getName() + '\'' +
-                ", status=" + super.getStatus() +
-                ", description='" + super.getDescription() + '\'' +
+        return  "Subtask{" +
+                "uin=" + uin +
+                ", type=" + type +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                ", description='" + description +
+                ", duration=" + duration + '\'' +
+                ", startTime=" + ((startTime == null) ? "null" : startTime.format(formatter)) +
+                ", endTime=" + ((getEndTime() == null) ? "null" : getEndTime().format(formatter)) +
                 ", epicId=" + epicId +
                 '}';
     }

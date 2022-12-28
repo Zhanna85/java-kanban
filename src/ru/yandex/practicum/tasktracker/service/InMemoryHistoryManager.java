@@ -74,12 +74,12 @@ public class InMemoryHistoryManager implements HistoryManager{
         if (viewedTasks.containsKey(id)) {
             Node<Task> node = viewedTasks.get(id); // Находим узел по id Task.
             removeNode(node); // Вырезаем узел из списка.
-            viewedTasks.remove(id); // удаляем запись из мапы.
+            viewedTasks.remove(id); // удаляем запись из Map.
         }
     }
 
     @Override
-    public List<Task> getHistory() { //надо изменить
+    public List<Task> getHistory() { // Возвращает список.
         return getTasks();
     }
 
