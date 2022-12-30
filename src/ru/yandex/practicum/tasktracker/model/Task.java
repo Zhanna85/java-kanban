@@ -1,37 +1,52 @@
 package ru.yandex.practicum.tasktracker.model;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
+
+import static ru.yandex.practicum.tasktracker.model.TypesTasks.TASK;
 
 public class Task {
     protected int uin; // Уникальный идентификационный номер задачи, по которому её можно будет найти.
-    protected TypesTasks type; // Тип задачи.
+    protected final TypesTasks type =TASK; // Тип задачи.
     protected String name; // Название, кратко описывающее суть задачи (например, «Переезд»).
     protected TaskStatus status; // Статус, отображающий её прогресс.
     protected String description; // Описание, в котором раскрываются детали.
-    protected int duration; // Продолжительность задачи, оценка того, сколько времени она займёт в минутах (число).
-    protected LocalDateTime startTime; // Дата и время, когда предполагается приступить к выполнению задачи.
+    protected Duration duration = Duration.ofMinutes(0); // Продолжительность задачи, оценка того, сколько времени она займёт в минутах (число).
+    protected LocalDateTime startTime = null; // Дата и время, когда предполагается приступить к выполнению задачи.
 
-    protected DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+    protected static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
-    public Task(int uin, TypesTasks type, String name, TaskStatus status, String description
-            , int duration, LocalDateTime startTime) {
+    public Task(int uin, String name, TaskStatus status, String description
+            , long duration, LocalDateTime startTime) {
         this.uin = uin;
-        this.type = type;
         this.name = name;
         this.status = status;
         this.description = description;
-        this.duration = duration;
+        this.duration = Duration.ofMinutes(duration);
         this.startTime = startTime;
+    }
+
+    public Task(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public Task(String name, String description, long duration, LocalDateTime startTime) {
+        this.name = name;
+        this.description = description;
+        this.duration = Duration.ofMinutes(duration);;
+        this.startTime = startTime;
+    }
+
+    public Task(int uin, String name, String description) {
+        this.uin = uin;
+        this.name = name;
+        this.description = description;
     }
 
     public TypesTasks getType() {
         return type;
-    }
-
-    public void setType(TypesTasks type) {
-        this.type = type;
     }
 
     public String getName() {
@@ -70,7 +85,7 @@ public class Task {
         return null;
     }
 
-    public int getDuration() {
+    public Duration getDuration() {
         return duration;
     }
 
@@ -78,7 +93,7 @@ public class Task {
         return startTime;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
@@ -89,7 +104,7 @@ public class Task {
     //метод рассчитывает время завершения задачи, которое рассчитывается исходя из startTime и duration
     public LocalDateTime getEndTime() {
         if (startTime != null) {
-            return startTime.plusMinutes(duration);
+            return startTime.plus(duration);
         }
         return null;
     }
@@ -103,8 +118,8 @@ public class Task {
                ", status=" + status +
                ", description='" + description +
                ", duration=" + duration + '\'' +
-               ", startTime=" + ((startTime == null) ? "null" : startTime.format(formatter)) +
-               ", endTime=" + ((getEndTime() == null) ? "null" : getEndTime().format(formatter)) +
+               ", startTime=" + ((startTime == null) ? "null" : startTime.format(FORMATTER)) +
+               ", endTime=" + ((getEndTime() == null) ? "null" : getEndTime().format(FORMATTER)) +
                '}';
     }
 }

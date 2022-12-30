@@ -5,25 +5,21 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.tasktracker.model.Epic;
 import ru.yandex.practicum.tasktracker.model.Subtask;
 import ru.yandex.practicum.tasktracker.model.Task;
+import ru.yandex.practicum.tasktracker.model.TaskStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.yandex.practicum.tasktracker.model.TaskStatus.IN_PROGRESS;
-import static ru.yandex.practicum.tasktracker.model.TaskStatus.NEW;
-import static ru.yandex.practicum.tasktracker.model.TypesTasks.*;
-import static ru.yandex.practicum.tasktracker.model.TypesTasks.SUBTASK;
 
 class HistoryManagerTest {
     HistoryManager historyManager;
-    Task newTask1 = new Task(1, TASK, "Задача №1", IN_PROGRESS, "Описание задачи №1"
+    Task newTask1 = new Task(1, "Задача №1", TaskStatus.NEW, "Описание задачи №1"
             , 0, null);
-    Task newTask2 = new Task(2, TASK, "Задача №2", NEW, "Описание задачи №2"
+    Task newTask2 = new Task(2, "Задача №2", TaskStatus.NEW, "Описание задачи №2"
             , 50, LocalDateTime.of(2022, 12, 27, 20, 0));
-    Epic newEpic1 = new Epic(3, EPIC, "Эпик №1", NEW, "Описание эпика №1"
-            , 0, null);
-    Subtask newSubtask1 = new Subtask(4, SUBTASK, "Подзадача №1 эпика №1", IN_PROGRESS
+    Epic newEpic1 = new Epic(3, "Эпик №1", "Описание эпика №1");
+    Subtask newSubtask1 = new Subtask(4, "Подзадача №1 эпика №1", TaskStatus.NEW
             ,"Описание подзадачи №1 эпика №1",  0, null, 3);
 
     @BeforeEach

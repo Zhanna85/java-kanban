@@ -2,21 +2,25 @@ package ru.yandex.practicum.tasktracker.model;
 
 import java.time.LocalDateTime;
 
+import static ru.yandex.practicum.tasktracker.model.TypesTasks.SUBTASK;
+
 public class Subtask extends Task {
     private Integer epicId;
+    private final TypesTasks type =SUBTASK; // Тип задачи.
 
-    public Subtask(int uin, TypesTasks type, String name, TaskStatus status, String description, int duration, LocalDateTime startTime, Integer epicId) {
-        super(uin, type, name, status, description, duration, startTime);
+    public Subtask(int uin, String name, TaskStatus status, String description, long duration, LocalDateTime startTime, Integer epicId) {
+        super(uin, name, status, description, duration, startTime);
+        this.epicId = epicId;
+    }
+
+    public Subtask(String name, String description, long duration, LocalDateTime startTime, Integer epicId) {
+        super(name, description, duration, startTime);
         this.epicId = epicId;
     }
 
     @Override
     public Integer getEpicId() {
         return epicId;
-    }
-
-    public void setEpicId(Integer epicId) {
-        this.epicId = epicId;
     }
 
     @Override
@@ -28,8 +32,8 @@ public class Subtask extends Task {
                 ", status=" + status +
                 ", description='" + description +
                 ", duration=" + duration + '\'' +
-                ", startTime=" + ((startTime == null) ? "null" : startTime.format(formatter)) +
-                ", endTime=" + ((getEndTime() == null) ? "null" : getEndTime().format(formatter)) +
+                ", startTime=" + ((startTime == null) ? "null" : startTime.format(FORMATTER)) +
+                ", endTime=" + ((getEndTime() == null) ? "null" : getEndTime().format(FORMATTER)) +
                 ", epicId=" + epicId +
                 '}';
     }

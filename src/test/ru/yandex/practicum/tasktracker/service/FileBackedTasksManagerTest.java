@@ -28,13 +28,10 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
         final List<Subtask> subtasks = taskManager.getListedOfAllSubtasks();
         final List<Task> history = taskManager.getHistory();
 
-        assertEquals(0, tasks.size(), "Неверное количество задач.");
         assertTrue(tasks.isEmpty(), "Список задач не пустой!");
 
-        assertEquals(0, epics.size(), "Неверное количество задач.");
         assertTrue(epics.isEmpty(), "Список эпиков не пустой!");
 
-        assertEquals(0, subtasks.size(), "Неверное количество задач.");
         assertTrue(subtasks.isEmpty(), "Список подзадач не пустой!");
 
         assertTrue(history.isEmpty(), "Список истории не пустой!");
@@ -88,7 +85,6 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
         assertEquals(2, tasks.size(), "Неверное количество задач.");
 
         assertTrue(subtasks.isEmpty(), "Список не пустой!");
-        assertEquals(0, subtasks.size(), "Неверное количество задач.");
 
         assertNotNull(epics, "Задачи не возвращаются.");
         assertEquals(2, epics.size(), "Неверное количество задач.");

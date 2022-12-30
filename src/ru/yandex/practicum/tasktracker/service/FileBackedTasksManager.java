@@ -93,11 +93,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         switch (type) {
             case SUBTASK:
                 final Integer epicId = Integer.valueOf(split[7]); // ID эпика.
-                return new Subtask(uin, type, name, status, description, duration, startTime, epicId);
+                return new Subtask(uin, name, status, description, duration, startTime, epicId);
             case TASK:
-                return new Task(uin, type, name, status, description, duration, startTime);
+                return new Task(uin, name, status, description, duration, startTime);
             default:
-            return new Epic(uin, type, name, status, description, duration, startTime);
+            return new Epic(uin, name, status, description, duration, startTime);
         }
     }
 
@@ -120,7 +120,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     private String toString(Task task) { //Сохранение задачи в строку.
-        return String.format("%d,%s,%s,%s,%s,%d,%s,%d", task.getUin(), task.getType(), task.getName()
+        return String.format("%d,%s,%s,%s,%s,%s,%s,%d", task.getUin(), task.getType(), task.getName()
                 , task.getStatus(), task.getDescription(), task.getDuration(), task.getStartTime(), task.getEpicId());
     }
 

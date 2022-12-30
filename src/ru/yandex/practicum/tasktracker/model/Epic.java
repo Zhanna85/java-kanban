@@ -4,13 +4,23 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static ru.yandex.practicum.tasktracker.model.TypesTasks.EPIC;
+
 public class Epic extends Task {
     private LocalDateTime endTime; // дата и время завершения эпика (расчетное).
+    private final TypesTasks type =EPIC; // Тип задачи.
     private final ArrayList<Integer> listIdSubtasks = new ArrayList<>(); // Список уин подзадач
 
-    public Epic(int uin, TypesTasks type, String name, TaskStatus status, String description
-            , int duration, LocalDateTime startTime) {
-        super(uin, type, name, status, description, duration, startTime);
+    public Epic(int uin, String name, TaskStatus status, String description, long duration, LocalDateTime startTime) {
+        super(uin, name, status, description, duration, startTime);
+    }
+
+    public Epic(String name, String description) {
+        super(name, description);
+    }
+
+    public Epic(int uin, String name, String description) {
+        super(uin, name, description);
     }
 
     public ArrayList<Integer> getListIdSubtasks() {
@@ -47,8 +57,8 @@ public class Epic extends Task {
                 ", status=" + status +
                 ", description='" + description + '\'' +
                 ", duration=" + duration +
-                ", startTime=" + ((startTime == null) ? "null" : startTime.format(formatter)) +
-                ", endTime=" + ((endTime == null) ? "null" : endTime.format(formatter)) +
+                ", startTime=" + ((startTime == null) ? "null" : startTime.format(FORMATTER)) +
+                ", endTime=" + ((endTime == null) ? "null" : endTime.format(FORMATTER)) +
                 ", listIdSubtasks=" + Arrays.asList(listIdSubtasks) +
                 '}';
     }
