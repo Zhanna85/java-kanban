@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="junit.jupiter" type="repository">
+  <library name="jupiter" type="repository">
     <properties maven-id="org.junit.jupiter:junit-jupiter:5.9.1" />
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/junit-jupiter-5.9.1.jar!/" />

@@ -156,8 +156,8 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
         history = taskManager.getHistory();
 
         assertEquals(1, tasks.size(), "Неверное количество задач.");
-        assertEquals(1, epics.size(), "Неверное количество задач.");
-        assertEquals(1, subtasks.size(), "Неверное количество задач.");
+        assertEquals(1, epics.size(), "Неверное количество эпиков.");
+        assertEquals(1, subtasks.size(), "Неверное количество подзадач.");
         assertEquals(3, history.size(), "Задачи не совпадают.");
     }
 

@@ -24,6 +24,11 @@ public class Subtask extends Task {
     }
 
     @Override
+    public TypesTasks getType() {
+        return type;
+    }
+
+    @Override
     public String toString() {
         return  "Subtask{" +
                 "uin=" + uin +
@@ -31,7 +36,7 @@ public class Subtask extends Task {
                 ", name='" + name + '\'' +
                 ", status=" + status +
                 ", description='" + description +
-                ", duration=" + duration + '\'' +
+                ", duration=" + duration.toMinutes() + '\'' +
                 ", startTime=" + ((startTime == null) ? "null" : startTime.format(FORMATTER)) +
                 ", endTime=" + ((getEndTime() == null) ? "null" : getEndTime().format(FORMATTER)) +
                 ", epicId=" + epicId +

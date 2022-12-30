@@ -83,7 +83,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         final String name = split[2]; // Название.
         final TaskStatus status = TaskStatus.valueOf(split[3]); // Статус.
         final String description = split[4]; // Описание.
-        final int duration = Integer.parseInt(split[5]); // Продолжительность задачи в минутах.
+        final long duration = Long.parseLong(split[5]); // Продолжительность задачи в минутах.
         LocalDateTime startTime = null;
 
         if(!split[6].equals("null")) {
@@ -120,8 +120,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     private String toString(Task task) { //Сохранение задачи в строку.
+        long duration = task.getDuration().toMinutes();
         return String.format("%d,%s,%s,%s,%s,%s,%s,%d", task.getUin(), task.getType(), task.getName()
-                , task.getStatus(), task.getDescription(), task.getDuration(), task.getStartTime(), task.getEpicId());
+                , task.getStatus(), task.getDescription(), duration , task.getStartTime(), task.getEpicId());
     }
 
     private void save() { // Сохраняем текущее состояние менеджера в указанный файл.

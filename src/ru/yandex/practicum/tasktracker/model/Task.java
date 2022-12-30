@@ -14,7 +14,6 @@ public class Task {
     protected String description; // Описание, в котором раскрываются детали.
     protected Duration duration = Duration.ofMinutes(0); // Продолжительность задачи, оценка того, сколько времени она займёт в минутах (число).
     protected LocalDateTime startTime = null; // Дата и время, когда предполагается приступить к выполнению задачи.
-
     protected static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     public Task(int uin, String name, TaskStatus status, String description
@@ -117,7 +116,7 @@ public class Task {
                ", name='" + name + '\'' +
                ", status=" + status +
                ", description='" + description +
-               ", duration=" + duration + '\'' +
+               ", duration=" + duration.toMinutes() + '\'' +
                ", startTime=" + ((startTime == null) ? "null" : startTime.format(FORMATTER)) +
                ", endTime=" + ((getEndTime() == null) ? "null" : getEndTime().format(FORMATTER)) +
                '}';

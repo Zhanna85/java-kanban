@@ -49,6 +49,11 @@ public class Epic extends Task {
     }
 
     @Override
+    public TypesTasks getType() {
+        return type;
+    }
+
+    @Override
     public String toString() { // нужен для информативного результата
         return  "Epic{" +
                 "uin=" + uin +
@@ -56,7 +61,7 @@ public class Epic extends Task {
                 ", name='" + name + '\'' +
                 ", status=" + status +
                 ", description='" + description + '\'' +
-                ", duration=" + duration +
+                ", duration=" + duration.toMinutes() +
                 ", startTime=" + ((startTime == null) ? "null" : startTime.format(FORMATTER)) +
                 ", endTime=" + ((endTime == null) ? "null" : endTime.format(FORMATTER)) +
                 ", listIdSubtasks=" + Arrays.asList(listIdSubtasks) +
