@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager{
-    protected final Map<Integer, Subtask> subtasks = new HashMap<>(); // Tаблица подзадач
-    protected final Map<Integer, Task> tasks = new HashMap<>(); // Таблица задач
-    protected final Map<Integer, Epic> epics = new HashMap<>(); // Таблица эпиков
+    protected Map<Integer, Subtask> subtasks = new HashMap<>(); // Tаблица подзадач
+    protected Map<Integer, Task> tasks = new HashMap<>(); // Таблица задач
+    protected Map<Integer, Epic> epics = new HashMap<>(); // Таблица эпиков
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
     protected final Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime
                     , Comparator.nullsLast(Comparator.naturalOrder()))

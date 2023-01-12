@@ -25,5 +25,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" exported="" name="jupiter" level="project" />
+    <orderEntry type="library" name="google.code.gson" level="application" />
   </component>
 </module>
