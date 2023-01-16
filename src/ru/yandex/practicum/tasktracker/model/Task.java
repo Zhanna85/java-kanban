@@ -3,12 +3,13 @@ package ru.yandex.practicum.tasktracker.model;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 import static ru.yandex.practicum.tasktracker.model.TypesTasks.TASK;
 
 public class Task {
     protected int uin; // Уникальный идентификационный номер задачи, по которому её можно будет найти.
-    protected final TypesTasks type =TASK; // Тип задачи.
+    private TypesTasks type = TASK; // Тип задачи.
     protected String name; // Название, кратко описывающее суть задачи (например, «Переезд»).
     protected TaskStatus status; // Статус, отображающий её прогресс.
     protected String description; // Описание, в котором раскрываются детали.
@@ -46,6 +47,10 @@ public class Task {
 
     public TypesTasks getType() {
         return type;
+    }
+
+    public void setType(TypesTasks type) {
+        this.type = type;
     }
 
     public String getName() {
@@ -106,6 +111,19 @@ public class Task {
             return startTime.plus(duration);
         }
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return uin == task.uin && type == task.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uin, type);
     }
 
     @Override

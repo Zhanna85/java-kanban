@@ -1,17 +1,18 @@
 package ru.yandex.practicum.tasktracker.server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import ru.yandex.practicum.tasktracker.adapter.GsonConverter;
 import ru.yandex.practicum.tasktracker.model.Epic;
 import ru.yandex.practicum.tasktracker.service.ManagerException;
-import ru.yandex.practicum.tasktracker.service.Managers;
 import ru.yandex.practicum.tasktracker.service.TaskManager;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -20,7 +21,7 @@ import static ru.yandex.practicum.tasktracker.server.HttpTaskServer.sendText;
 
 public class EpicHandler implements HttpHandler {
     private final TaskManager taskManager;
-    private final Gson gson = Managers.getGson();
+    private final Gson gson = GsonConverter.getGsonTaskConverter();
     private boolean thisGson;
     public EpicHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
@@ -41,7 +42,7 @@ public class EpicHandler implements HttpHandler {
                         break;
                     }
                     case GET_ID: { //Запрос эпика по ИД.
-                        String pathId = path.split("/")[4];
+                        String pathId = getPathID(path);
                         int id = getId(pathId);
                         if (id != -1) {
                             String response = gson.toJson(taskManager.getByIDEpic(id));
@@ -53,27 +54,28 @@ public class EpicHandler implements HttpHandler {
 
                         break;
                     }
-
                     case ADD: { // Добавляем эпик.
-                        Epic epic = deserializationTasks(httpExchange, Epic.class);
+                        Epic epic = deserializationEpic(httpExchange);
                         if (epic == null) return;
-                        taskManager.createEpic(epic);
-                        String response = "Эпик создан.";
-                        sendText(httpExchange, response, 200);
+                        try {
+                            taskManager.createEpic(epic);
+                        } catch (ManagerException exception) {
+                            sendText(httpExchange, exception.getMessage(), 400);
+                        }
+                        sendText(httpExchange, gson.toJson(epic), 200);
                         break;
                     }
                     case UPDATE: { // Обновляем эпик.
-                        String pathId = path.split("/")[4];
+                        String pathId = getPathID(path);
                         int id = getId(pathId);
                         if (id != -1) {
-                            Epic epic = deserializationTasks(httpExchange, Epic.class);
+                            Epic epic = deserializationEpic(httpExchange);
                             try {
                                 taskManager.updateEpic(epic);
                             } catch (ManagerException exception) {
                                 sendText(httpExchange, exception.getMessage(), 400);
                             }
-                            String response = "Эпик с ИД - " + id + " обновлен.";
-                            sendText(httpExchange, response, 200);
+                            sendText(httpExchange, gson.toJson(epic), 200);
                         } else {
                             sendText(httpExchange, "Получен некорректный идентификатор" + pathId
                                     , 400);
@@ -86,7 +88,7 @@ public class EpicHandler implements HttpHandler {
                         break;
                     }
                     case DELETE_ID: { // Удаляем эпик по ИД.
-                        String pathId = path.split("/")[4];
+                        String pathId = getPathID(path);
                         int id = getId(pathId);
                         if (id !=-1) {
                             try {
@@ -119,7 +121,7 @@ public class EpicHandler implements HttpHandler {
         switch (method) {
             case "GET":
                 if (Pattern.matches("^/tasks/epic$", path)) {
-                    return Endpoint.DELETE_ALL;
+                    return Endpoint.GET_ALL;
                 }
                 if (Pattern.matches("^/tasks/epic/\\d+$", path)) {
                     return Endpoint.GET_ID;
@@ -155,13 +157,13 @@ public class EpicHandler implements HttpHandler {
         return thisGson;
     }
 
-    protected  <T> T deserializationTasks(HttpExchange httpExchange, Class<T> task) throws IOException {
+    protected  Epic deserializationEpic(HttpExchange httpExchange) throws IOException {
         try {
             // Извлекаем тело запроса.
-            InputStream inputStream = httpExchange.getRequestBody();
-            String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+            String body = new String(httpExchange.getRequestBody().readAllBytes(), DEFAULT_CHARSET);
+            final JsonElement jsonElement = JsonParser.parseString(body);
             try {
-                return gson.fromJson(body, task);
+                return gson.fromJson(jsonElement, Epic.class);
             } catch (JsonSyntaxException e) {
                 sendText(httpExchange, "Получен некорректный JSON", 400);
             }
@@ -170,6 +172,10 @@ public class EpicHandler implements HttpHandler {
         }
 
         return null;
+    }
+
+    private String getPathID(String path) { // ИД который передан в элементе URL
+        return path.split("/")[3];
     }
 
     protected int getId(String pathId) { // Форматируем ИД, если формат не верный вернет -1.

@@ -1,17 +1,18 @@
 package ru.yandex.practicum.tasktracker.server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import ru.yandex.practicum.tasktracker.adapter.GsonConverter;
 import ru.yandex.practicum.tasktracker.model.Subtask;
 import ru.yandex.practicum.tasktracker.service.ManagerException;
-import ru.yandex.practicum.tasktracker.service.Managers;
 import ru.yandex.practicum.tasktracker.service.TaskManager;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -20,7 +21,7 @@ import static ru.yandex.practicum.tasktracker.server.HttpTaskServer.sendText;
 
 public class SubtaskHandler implements HttpHandler {
     private final TaskManager taskManager;
-    private final Gson gson = Managers.getGson();
+    private final Gson gson = GsonConverter.getGsonTaskConverter();
     private boolean thisGson;
 
     public SubtaskHandler(TaskManager taskManager) {
@@ -43,7 +44,7 @@ public class SubtaskHandler implements HttpHandler {
                         break;
                     }
                     case GET_ID: {
-                        String pathId = path.split("/")[4];
+                        String pathId = getPathID(path);
                         int id = getId(pathId);
                         if (id != -1) {
                             String response = gson.toJson(taskManager.getByIDSubtask(id));
@@ -56,7 +57,7 @@ public class SubtaskHandler implements HttpHandler {
                         break;
                     }
                     case GET_EPIC_SUBTASK: {
-                        String pathId = path.split("/")[5];
+                        String pathId = path.split("/")[4];
                         int id = getId(pathId);
                         if (id != -1) {
                             String response = gson.toJson(taskManager.getListAllSubtasksOfEpic(id));
@@ -69,25 +70,27 @@ public class SubtaskHandler implements HttpHandler {
                         break;
                     }
                     case ADD: {
-                        Subtask subtask = deserializationTasks(httpExchange);
+                        Subtask subtask = deserializationSubtask(httpExchange);
                         if (subtask == null) return;
-                        taskManager.createSubtask(subtask);
-                        String response = "Подзадача создана.";
-                        sendText(httpExchange, response, 200);
+                        try {
+                            taskManager.createSubtask(subtask);
+                        } catch (ManagerException exception) {
+                            sendText(httpExchange, exception.getMessage(), 400);
+                        }
+                        sendText(httpExchange, gson.toJson(subtask), 200);
                         break;
                     }
                     case UPDATE: {
-                        String pathId = path.split("/")[4];
+                        String pathId = getPathID(path);
                         int id = getId(pathId);
                         if (id != -1) {
-                            Subtask subtask = deserializationTasks(httpExchange);
+                            Subtask subtask = deserializationSubtask(httpExchange);
                             try {
                                 taskManager.updateSubtask(subtask);
                             } catch (ManagerException exception) {
                                 sendText(httpExchange, exception.getMessage(), 400);
                             }
-                            String response = "Подзадача с ИД - " + id + " обновлена.";
-                            sendText(httpExchange, response, 200);
+                            sendText(httpExchange, gson.toJson(subtask), 200);
                         } else {
                             sendText(httpExchange, "Получен некорректный идентификатор" + pathId
                                     , 400);
@@ -100,7 +103,7 @@ public class SubtaskHandler implements HttpHandler {
                         break;
                     }
                     case DELETE_ID: {
-                        String pathId = path.split("/")[4];
+                        String pathId = getPathID(path);
                         int id = getId(pathId);
                         if (id !=-1) {
                             try {
@@ -174,13 +177,13 @@ public class SubtaskHandler implements HttpHandler {
         return thisGson;
     }
 
-    protected Subtask deserializationTasks(HttpExchange httpExchange) throws IOException {
+    protected Subtask deserializationSubtask(HttpExchange httpExchange) throws IOException {
         try {
             // Извлекаем тело запроса.
-            InputStream inputStream = httpExchange.getRequestBody();
-            String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+            String body = new String(httpExchange.getRequestBody().readAllBytes(), DEFAULT_CHARSET);
+            final JsonElement jsonElement = JsonParser.parseString(body);
             try {
-                return gson.fromJson(body, Subtask.class);
+                return gson.fromJson(jsonElement, Subtask.class);
             } catch (JsonSyntaxException e) {
                 sendText(httpExchange, "Получен некорректный JSON", 400);
             }
@@ -189,6 +192,10 @@ public class SubtaskHandler implements HttpHandler {
         }
 
         return null;
+    }
+
+    private String getPathID(String path) { // ИД который передан в элементе URL
+        return path.split("/")[3];
     }
 
     protected int getId(String pathId) { // Форматируем ИД, если формат не верный вернет -1.

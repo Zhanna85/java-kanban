@@ -1,17 +1,23 @@
 package ru.yandex.practicum.tasktracker;
 
 import ru.yandex.practicum.tasktracker.model.*;
+import ru.yandex.practicum.tasktracker.server.KVServer;
+import ru.yandex.practicum.tasktracker.service.HttpTaskManager;
 import ru.yandex.practicum.tasktracker.service.Managers;
 import ru.yandex.practicum.tasktracker.service.TaskManager;
 
+import java.io.IOException;
+import java.net.URI;
 import java.time.LocalDateTime;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Поехали!");
+        new KVServer().start();
 
-        TaskManager taskManager = Managers.getDefaultNewManager();
+        HttpTaskManager taskManager = new HttpTaskManager(URI.create("http://localhost:8078"));
+        taskManager.loadFromServer();
 
         System.out.println("Список: " + taskManager.getListedOfAllEpics());
         System.out.println();

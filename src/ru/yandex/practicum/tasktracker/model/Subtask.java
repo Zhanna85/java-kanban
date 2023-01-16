@@ -6,16 +6,17 @@ import static ru.yandex.practicum.tasktracker.model.TypesTasks.SUBTASK;
 
 public class Subtask extends Task {
     private Integer epicId;
-    private final TypesTasks type =SUBTASK; // Тип задачи.
 
     public Subtask(int uin, String name, TaskStatus status, String description, long duration, LocalDateTime startTime, Integer epicId) {
         super(uin, name, status, description, duration, startTime);
         this.epicId = epicId;
+        setType(SUBTASK);
     }
 
     public Subtask(String name, String description, long duration, LocalDateTime startTime, Integer epicId) {
         super(name, description, duration, startTime);
         this.epicId = epicId;
+        setType(SUBTASK);
     }
 
     @Override
@@ -24,15 +25,10 @@ public class Subtask extends Task {
     }
 
     @Override
-    public TypesTasks getType() {
-        return type;
-    }
-
-    @Override
     public String toString() {
         return  "Subtask{" +
                 "uin=" + uin +
-                ", type=" + type +
+                ", type=" + getType() +
                 ", name='" + name + '\'' +
                 ", status=" + status +
                 ", description='" + description +

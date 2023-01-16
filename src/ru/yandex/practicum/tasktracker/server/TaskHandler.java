@@ -1,13 +1,15 @@
 package ru.yandex.practicum.tasktracker.server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import ru.yandex.practicum.tasktracker.adapter.GsonConverter;
 import ru.yandex.practicum.tasktracker.model.Task;
 import ru.yandex.practicum.tasktracker.service.ManagerException;
-import ru.yandex.practicum.tasktracker.service.Managers;
 import ru.yandex.practicum.tasktracker.service.TaskManager;
 
 import java.io.IOException;
@@ -20,7 +22,7 @@ import static ru.yandex.practicum.tasktracker.server.HttpTaskServer.sendText;
 
 public class TaskHandler implements HttpHandler {
     private final TaskManager taskManager;
-    private final Gson gson = Managers.getGson();
+    private final Gson gson = GsonConverter.getGsonTaskConverter();
     private boolean thisGson;
 
     public TaskHandler(TaskManager taskManager) {
@@ -43,7 +45,7 @@ public class TaskHandler implements HttpHandler {
                         break;
                     }
                     case GET_ID: { //Запрос задачи по ИД.
-                        String pathId = path.split("/")[4];
+                        String pathId = getPathID(path);
                         int id = getId(pathId);
                         if (id != -1) {
                             String response = gson.toJson(taskManager.getByIDTask(id));
@@ -55,27 +57,28 @@ public class TaskHandler implements HttpHandler {
 
                         break;
                     }
-
                     case ADD: { // Добавляем задачу.
-                        Task task = deserializationTasks(httpExchange, Task.class);
+                        Task task = deserializationTasks(httpExchange);
                         if (task == null) return;
-                        taskManager.createTask(task);
-                        String response = "Задача создана.";
-                        sendText(httpExchange, response, 200);
+                        try{
+                            taskManager.createTask(task);
+                        }catch (ManagerException exception) {
+                            sendText(httpExchange, exception.getMessage(), 400);
+                        }
+                        sendText(httpExchange, gson.toJson(task), 200);
                         break;
                     }
                     case UPDATE: { // Обновляем задачу.
-                        String pathId = path.split("/")[4];
+                        String pathId = getPathID(path);
                         int id = getId(pathId);
                         if (id != -1) {
-                            Task task = deserializationTasks(httpExchange, Task.class);
+                            Task task = deserializationTasks(httpExchange);
                             try {
                                 taskManager.updateTask(task);
                             } catch (ManagerException exception) {
                                 sendText(httpExchange, exception.getMessage(), 400);
                             }
-                            String response = "Задача с ИД - " + id + " обновлена.";
-                            sendText(httpExchange, response, 200);
+                            sendText(httpExchange, gson.toJson(task), 200);
                         } else {
                             sendText(httpExchange, "Получен некорректный идентификатор" + pathId
                                     , 400);
@@ -88,7 +91,7 @@ public class TaskHandler implements HttpHandler {
                         break;
                     }
                     case DELETE_ID: { // Удаляем задачу по ИД.
-                        String pathId = path.split("/")[4];
+                        String pathId = getPathID(path);
                         int id = getId(pathId);
                         if (id !=-1) {
                             try {
@@ -122,7 +125,7 @@ public class TaskHandler implements HttpHandler {
         switch (method) {
             case "GET":
                 if (Pattern.matches("^/tasks/task$", path)) {
-                    return Endpoint.DELETE_ALL;
+                    return Endpoint.GET_ALL;
                 }
                 if (Pattern.matches("^/tasks/task/\\d+$", path)) {
                     return Endpoint.GET_ID;
@@ -159,15 +162,17 @@ public class TaskHandler implements HttpHandler {
         return thisGson;
     }
 
-    protected  <T> T deserializationTasks(HttpExchange httpExchange, Class<T> task) throws IOException {
+    protected  Task deserializationTasks(HttpExchange httpExchange) throws IOException {
         try {
             // Извлекаем тело запроса.
             InputStream inputStream = httpExchange.getRequestBody();
             String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+            final JsonElement jsonElement = JsonParser.parseString(body);
             try {
-                return gson.fromJson(body, task);
+                return gson.fromJson(jsonElement, Task.class);
             } catch (JsonSyntaxException e) {
                 sendText(httpExchange, "Получен некорректный JSON", 400);
+                e.printStackTrace();
             }
         } catch (IOException exception) {
             sendText(httpExchange, exception.getMessage(), 400);
@@ -176,7 +181,11 @@ public class TaskHandler implements HttpHandler {
         return null;
     }
 
-    protected int getId(String pathId) { // Форматируем ИД, если формат не верный вернет -1.
+    private String getPathID(String path) { // ИД который передан в элементе URL
+        return path.split("/")[3];
+    }
+
+    private int getId(String pathId) { // Форматируем ИД, если формат не верный вернет -1.
         try {
             return Integer.parseInt(pathId);
         } catch (NumberFormatException exception) {

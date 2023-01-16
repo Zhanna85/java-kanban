@@ -8,19 +8,21 @@ import static ru.yandex.practicum.tasktracker.model.TypesTasks.EPIC;
 
 public class Epic extends Task {
     private LocalDateTime endTime; // дата и время завершения эпика (расчетное).
-    private final TypesTasks type =EPIC; // Тип задачи.
     private final ArrayList<Integer> listIdSubtasks = new ArrayList<>(); // Список уин подзадач
 
     public Epic(int uin, String name, TaskStatus status, String description, long duration, LocalDateTime startTime) {
         super(uin, name, status, description, duration, startTime);
+        setType(EPIC);
     }
 
     public Epic(String name, String description) {
         super(name, description);
+        setType(EPIC);
     }
 
     public Epic(int uin, String name, String description) {
         super(uin, name, description);
+        setType(EPIC);
     }
 
     public ArrayList<Integer> getListIdSubtasks() {
@@ -49,15 +51,10 @@ public class Epic extends Task {
     }
 
     @Override
-    public TypesTasks getType() {
-        return type;
-    }
-
-    @Override
     public String toString() { // нужен для информативного результата
         return  "Epic{" +
                 "uin=" + uin +
-                ", type=" + type +
+                ", type=" + getType() +
                 ", name='" + name + '\'' +
                 ", status=" + status +
                 ", description='" + description + '\'' +

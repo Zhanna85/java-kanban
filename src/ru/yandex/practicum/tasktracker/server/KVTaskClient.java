@@ -15,35 +15,36 @@ public class KVTaskClient {
         // создаём экземпляр URI, содержащий адрес нужного ресурса
         URI uri = URI.create(url + "/register");
 
+        // HTTP-клиент с настройками по умолчанию
+        HttpClient client = HttpClient.newHttpClient();
+
         // создаём объект, описывающий HTTP-запрос
         HttpRequest request = HttpRequest.newBuilder() // получаем экземпляр билдера
                 .uri(uri) // указываем адрес ресурса
                 .GET()    // указываем HTTP-метод запроса
+                .version(HttpClient.Version.HTTP_1_1) // указываем версию протокола
+                .header("Content-type", "application/json") // название заголовка и его значение
                 .build(); // заканчиваем настройку и создаём ("строим") http-запрос
 
-        // HTTP-клиент с настройками по умолчанию
-        HttpClient client = HttpClient.newHttpClient();
-
-        // получаем стандартный обработчик тела запроса с конвертацией содержимого в строку
-        HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
-
         // отправляем запрос и получаем HTTP-ответ от сервера
-        HttpResponse<String> response = client.send(request, handler);
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         // получаем тело ответа в виде строки - токен (API_TOKEN)
         responseBody = response.body();
     }
 
-    // охраняем состояние менеджера задач через запрос с методом POST
+    // сохраняем состояние менеджера задач через запрос с методом POST
     public void put(String key, String json) {
         HttpClient client = HttpClient.newHttpClient();
         URI newUri = URI.create(url + "/save/" + key + "?API_TOKEN=" + responseBody);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(newUri)
                 .POST(HttpRequest.BodyPublishers.ofString(json))
+                .version(HttpClient.Version.HTTP_1_1)
+                .header("Content-type", "application/json")
                 .build();
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
             System.out.println("Во время выполнения запроса ресурса по URL-адресу: '" + newUri + "', возникла ошибка.\n"
                     + "Проверьте, пожалуйста, адрес и повторите попытку.");
@@ -51,18 +52,17 @@ public class KVTaskClient {
     }
 
     // возвращаем состояние менеджера задач через запрос с методом GET
-    public String load(String key) {
+    public String load(String key) throws IOException, InterruptedException {
         URI newUrl = URI.create(url + "/load/" + key + "?API_TOKEN=" + responseBody);
         HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(newUrl).GET().build();
-        String body = ""; // Тело ответа - состояние менеджера задач.
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            body = response.body();
-        } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
-            System.out.println("Во время выполнения запроса ресурса по URL-адресу: '" + newUrl + "', возникла ошибка.\n"
-                    + "Проверьте, пожалуйста, адрес и повторите попытку.");
-        }
-        return body;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(newUrl)
+                .GET()
+                .version(HttpClient.Version.HTTP_1_1)
+                .header("Content-type", "application/json")
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        return response.body();
     }
 }
