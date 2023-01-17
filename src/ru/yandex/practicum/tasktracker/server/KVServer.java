@@ -27,28 +27,31 @@ public class KVServer {
 		server.createContext("/load", this::load);
 	}
 
+	private String text = "";
+
 	private void load(HttpExchange h) throws IOException {
 		// Добавим получение значения по ключу
 		try {
 			System.out.println("\n/load");
 			if (!hasAuth(h)) {
-				System.out.println("Запрос неавторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
-				h.sendResponseHeaders(403, 0);
+				text = "Запрос неавторизован, нужен параметр в query API_TOKEN со значением апи-ключа";
+				//h.sendResponseHeaders(403, 0);
+				sendText(h, text, 403);
 				return;
 			}
 			if ("GET".equals(h.getRequestMethod())) {
 				String key = h.getRequestURI().getPath().substring("/load/".length());
 				if (key.isEmpty()) {
-					System.out.println("Key для загрузки пустой. key указывается в пути: /load/{key}");
-					h.sendResponseHeaders(400, 0);
+					text = "Key для загрузки пустой. key указывается в пути: /load/{key}";
+					//h.sendResponseHeaders(400, 0);
+					sendText(h, text, 400);
 					return;
 				}
 				if (data.containsKey(key)) {
-					sendText(h, data.get(key));
+					sendText(h, data.get(key), 200);
 					return;
 				}
 
-				System.out.println("Value для восстановления пустой.");
 				h.sendResponseHeaders(204, 0);
 			}
 		} finally {
@@ -60,29 +63,33 @@ public class KVServer {
 		try {
 			System.out.println("\n/save");
 			if (!hasAuth(h)) {
-				System.out.println("Запрос неавторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
-				h.sendResponseHeaders(403, 0);
+				text = "Запрос неавторизован, нужен параметр в query API_TOKEN со значением апи-ключа";
+				//h.sendResponseHeaders(403, 0);
+				sendText(h, text, 403);
 				return;
 			}
 			if ("POST".equals(h.getRequestMethod())) {
 				String key = h.getRequestURI().getPath().substring("/save/".length());
 				if (key.isEmpty()) {
-					System.out.println("Key для сохранения пустой. key указывается в пути: /save/{key}");
-					h.sendResponseHeaders(400, 0);
+					text = "Key для сохранения пустой. key указывается в пути: /save/{key}";
+					//h.sendResponseHeaders(400, 0);
+					sendText(h, text, 400);
 					return;
 				}
 				String value = readText(h);
 				if (value.isEmpty()) {
-					System.out.println("Value для сохранения пустой. value указывается в теле запроса");
-					h.sendResponseHeaders(400, 0);
+					text = "Value для сохранения пустой. value указывается в теле запроса";
+					//h.sendResponseHeaders(400, 0);
+					sendText(h, text, 400);
 					return;
 				}
 				data.put(key, value);
 				System.out.println("Значение для ключа " + key + " успешно обновлено!");
 				h.sendResponseHeaders(200, 0);
 			} else {
-				System.out.println("/save ждёт POST-запрос, а получил: " + h.getRequestMethod());
+				text = "/save ждёт POST-запрос, а получил: " + h.getRequestMethod();
 				h.sendResponseHeaders(405, 0);
+				sendText(h, text, 405);
 			}
 		} finally {
 			h.close();
@@ -93,10 +100,11 @@ public class KVServer {
 		try {
 			System.out.println("\n/register");
 			if ("GET".equals(h.getRequestMethod())) {
-				sendText(h, apiToken);
+				sendText(h, apiToken, 200);
 			} else {
-				System.out.println("/register ждёт GET-запрос, а получил " + h.getRequestMethod());
-				h.sendResponseHeaders(405, 0);
+				text = "/register ждёт GET-запрос, а получил " + h.getRequestMethod();
+				//h.sendResponseHeaders(405, 0);
+				sendText(h, text, 405);
 			}
 		} finally {
 			h.close();
@@ -128,10 +136,10 @@ public class KVServer {
 		return new String(h.getRequestBody().readAllBytes(), UTF_8);
 	}
 
-	protected void sendText(HttpExchange h, String text) throws IOException {
+	protected void sendText(HttpExchange h, String text, int responseCode) throws IOException {
 		byte[] resp = text.getBytes(UTF_8);
 		h.getResponseHeaders().add("Content-Type", "application/json");
-		h.sendResponseHeaders(200, resp.length);
+		h.sendResponseHeaders(responseCode, resp.length);
 		h.getResponseBody().write(resp);
 	}
 }

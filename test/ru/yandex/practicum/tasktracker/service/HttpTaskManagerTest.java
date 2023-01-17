@@ -32,15 +32,15 @@ class HttpTaskManagerTest {
     private final HttpClient client = HttpClient.newHttpClient();
     static HttpTaskServer httpTaskServer;
     static KVServer kvServer;
-    Task newTask;
-    Task newTask1;
-    Task newTask2;
-    Epic newEpic;
-    Epic newEpic1;
-    Epic newEpic2;
-    Subtask newSubtask;
-    Subtask newSubtask1;
-    Subtask newSubtask2;
+    private Task newTask;
+    private Task newTask1;
+    private Task newTask2;
+    private Epic newEpic;
+    private Epic newEpic1;
+    private Epic newEpic2;
+    private Subtask newSubtask;
+    private Subtask newSubtask1;
+    private Subtask newSubtask2;
 
     @BeforeEach
     void beforeEach() throws IOException {

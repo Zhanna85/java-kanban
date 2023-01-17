@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.practicum.tasktracker.adapter.GsonConverter;
@@ -14,7 +13,6 @@ import ru.yandex.practicum.tasktracker.service.TaskManager;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import static ru.yandex.practicum.tasktracker.server.HttpTaskServer.DEFAULT_CHARSET;
@@ -23,7 +21,6 @@ import static ru.yandex.practicum.tasktracker.server.HttpTaskServer.sendText;
 public class TaskHandler implements HttpHandler {
     private final TaskManager taskManager;
     private final Gson gson = GsonConverter.getGsonTaskConverter();
-    private boolean thisGson;
 
     public TaskHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
@@ -33,88 +30,84 @@ public class TaskHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange httpExchange) {
         try {
-            if (getThisJson(httpExchange)) {
-                String method = httpExchange.getRequestMethod();
-                String path = httpExchange.getRequestURI().getPath();
-                Endpoint endpoint = getEndpoint(path, method);
+            String method = httpExchange.getRequestMethod();
+            String path = httpExchange.getRequestURI().getPath();
+            Endpoint endpoint = getEndpoint(path, method);
 
-                switch (endpoint) {
-                    case GET_ALL: { // Запрос всех задач.
-                        String response = gson.toJson(taskManager.getListedOfAllTasks());
+            switch (endpoint) {
+                case GET_ALL: { // Запрос всех задач.
+                    String response = gson.toJson(taskManager.getListedOfAllTasks());
+                    sendText(httpExchange, response, 200);
+                    break;
+                }
+                case GET_ID: { //Запрос задачи по ИД.
+                    String pathId = getPathID(path);
+                    int id = getId(pathId);
+                    if (id != -1) {
+                        String response = gson.toJson(taskManager.getByIDTask(id));
                         sendText(httpExchange, response, 200);
-                        break;
+                    } else {
+                        sendText(httpExchange, "Получен некорректный идентификатор" + pathId
+                                , 400);
                     }
-                    case GET_ID: { //Запрос задачи по ИД.
-                        String pathId = getPathID(path);
-                        int id = getId(pathId);
-                        if (id != -1) {
-                            String response = gson.toJson(taskManager.getByIDTask(id));
-                            sendText(httpExchange, response, 200);
-                        } else {
-                            sendText(httpExchange, "Получен некорректный идентификатор" + pathId
-                                    , 400);
-                        }
 
-                        break;
+                    break;
+                }
+                case ADD: { // Добавляем задачу.
+                    Task task = deserializationTasks(httpExchange);
+                    if (task == null) return;
+                    try {
+                        taskManager.createTask(task);
+                    } catch (ManagerException exception) {
+                        sendText(httpExchange, exception.getMessage(), 400);
                     }
-                    case ADD: { // Добавляем задачу.
+                    sendText(httpExchange, gson.toJson(task), 200);
+                    break;
+                }
+                case UPDATE: { // Обновляем задачу.
+                    String pathId = getPathID(path);
+                    int id = getId(pathId);
+                    if (id != -1) {
                         Task task = deserializationTasks(httpExchange);
-                        if (task == null) return;
-                        try{
-                            taskManager.createTask(task);
-                        }catch (ManagerException exception) {
+                        try {
+                            taskManager.updateTask(task);
+                        } catch (ManagerException exception) {
                             sendText(httpExchange, exception.getMessage(), 400);
                         }
                         sendText(httpExchange, gson.toJson(task), 200);
-                        break;
+                    } else {
+                        sendText(httpExchange, "Получен некорректный идентификатор" + pathId
+                                , 400);
                     }
-                    case UPDATE: { // Обновляем задачу.
-                        String pathId = getPathID(path);
-                        int id = getId(pathId);
-                        if (id != -1) {
-                            Task task = deserializationTasks(httpExchange);
-                            try {
-                                taskManager.updateTask(task);
-                            } catch (ManagerException exception) {
-                                sendText(httpExchange, exception.getMessage(), 400);
-                            }
-                            sendText(httpExchange, gson.toJson(task), 200);
-                        } else {
-                            sendText(httpExchange, "Получен некорректный идентификатор" + pathId
-                                    , 400);
-                        }
-                        break;
-                    }
-                    case DELETE_ALL: { // Удаляем все задачи.
-                        taskManager.deleteAllTasks();
-                        sendText(httpExchange, "Задачи удалены", 200);
-                        break;
-                    }
-                    case DELETE_ID: { // Удаляем задачу по ИД.
-                        String pathId = getPathID(path);
-                        int id = getId(pathId);
-                        if (id !=-1) {
-                            try {
-                                taskManager.deleteTaskByID(id);
-                            } catch (ManagerException exception) {
-                                sendText(httpExchange, exception.getMessage(), 400);
-                            }
-
-                            sendText(httpExchange, "Задача с ИД - " + id + "удалена", 200);
-                        } else {
-                            sendText(httpExchange, "Получен некорректный идентификатор" + pathId
-                                    , 400);
-                        }
-                        break;
-                    }
-                    default:
-                        String text = "Получен не допустимый метод запроса. Ожидалось GET, POST или DELETE";
-                        sendText(httpExchange, text, 400);
+                    break;
                 }
-            } else {
-                sendText(httpExchange, "Полученный запрос не в формате JSON", 400);
+                case DELETE_ALL: { // Удаляем все задачи.
+                    taskManager.deleteAllTasks();
+                    sendText(httpExchange, "Задачи удалены", 200);
+                    break;
+                }
+                case DELETE_ID: { // Удаляем задачу по ИД.
+                    String pathId = getPathID(path);
+                    int id = getId(pathId);
+                    if (id != -1) {
+                        try {
+                            taskManager.deleteTaskByID(id);
+                        } catch (ManagerException exception) {
+                            sendText(httpExchange, exception.getMessage(), 400);
+                        }
+
+                        sendText(httpExchange, "Задача с ИД - " + id + "удалена", 200);
+                    } else {
+                        sendText(httpExchange, "Получен некорректный идентификатор" + pathId
+                                , 400);
+                    }
+                    break;
+                }
+                default:
+                    String text = "Получен не допустимый метод запроса. Ожидалось GET, POST или DELETE";
+                    sendText(httpExchange, text, 400);
             }
-        } catch (Exception exception) {
+        } catch (IOException exception) {
             exception.printStackTrace();
         } finally {
             httpExchange.close();
@@ -151,18 +144,7 @@ public class TaskHandler implements HttpHandler {
         return Endpoint.UNKNOWN;
     }
 
-    protected boolean getThisJson(HttpExchange httpExchange) { // Проверяем тип передаваемых данных
-        Headers requestHeaders = httpExchange.getRequestHeaders();
-        List<String> contentTypeValues = requestHeaders.get("Content-type");
-
-        // тело запроса должно передаваться в формате JSON.
-        if ((contentTypeValues != null) && (contentTypeValues.contains("application/json"))) {
-            thisGson = true;
-        }
-        return thisGson;
-    }
-
-    protected  Task deserializationTasks(HttpExchange httpExchange) throws IOException {
+    protected Task deserializationTasks(HttpExchange httpExchange) throws IOException {
         try {
             // Извлекаем тело запроса.
             InputStream inputStream = httpExchange.getRequestBody();
