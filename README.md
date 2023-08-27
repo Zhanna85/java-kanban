@@ -1,2 +1,4 @@
 # java-kanban
-Repository for homework project.
+**Бэкенд для менеджера задач**
+## Стек используемых технологий:
+Java, JUnit
